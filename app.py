@@ -1,7 +1,8 @@
+import os
 import mysql.connector
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
+from tkinter import simpledialog, Tk
 import random
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -186,19 +187,39 @@ def fetch_data(cursor, query, params=None):
 
 
 def main():
-    connection = mysql.connector.connect(user='root', password='14Lizzie', host='127.0.0.1', database="project")
+    db_host = os.getenv('MY_APP_DB_HOST', 'localhost')  # Default to 'localhost' if not set
+    db_user = os.getenv('MY_APP_DB_USER', 'root')       # Default to 'root' if not set
+    db_password = simpledialog.askstring("Password", "Please enter your MySQL password:", show='*')
+    db_name = os.getenv('MY_APP_DB_NAME', 'project')    # Default to 'project' if not set
+
+    connection = mysql.connector.connect(
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name
+    )
+
     cursor = connection.cursor()
 
     app_window = Tk()
-    app_window['bg'] = '#F0F0F0'  # Light grey background
+    app_window.configure(bg='#EFEFEF')
     app_window.title("Crop Monitoring Application")
-    app_window.geometry("800x500")  # Adjust the size as needed
+    app_window.geometry("900x600")
     app_window.resizable(True, True)  # Allow resizing
+
+    
+    # Title for the dropdown section
+    title_label = Label(app_window, text="Crop Monitoring Application", font=('Helvetica', 18, 'bold'))
+    title_label.pack(pady=(10, 0))
+
+    # Description/instructions for the user
+    instructions_label = Label(app_window, text="Please select a farmer and a crop to get started.",
+                               font=('Helvetica', 10))
+    instructions_label.pack(pady=(0, 10))
 
     # Frame for dropdown menus
     dropdown_frame = Frame(app_window)
     dropdown_frame.pack(pady=10)
-
     # Fetch farmers and build a name-to-ID mapping
     farmers = fetch_data(cursor, "SELECT FarmerID, company_name FROM FARMER")
     farmer_name_to_id = {farmer[1]: farmer[0] for farmer in farmers}
@@ -223,6 +244,7 @@ def main():
     result_label = Label(app_window, text="", justify=LEFT, wraplength=550, bg='white', fg='black', font=('Helvetica', 10))
     result_label.pack(pady=10, padx=10, fill=BOTH, expand=True)
     result_label.config(borderwidth=2, relief="groove")
+    
     # Function to update crops based on selected farmer
     def update_crops(*args):
         farmer_id = farmer_name_to_id[selected_farmer_name.get()]
@@ -252,12 +274,13 @@ def main():
     weather_conditions_btn = Button(buttons_frame, text="Check Weather Conditions", command=lambda: call_function(weather_conditions, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
     calculate_profitability_btn = Button(buttons_frame, text="Calculate Profibality", command=lambda: call_function(calculate_profitability, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
     
-    irrigation_btn.grid(row=1, column=0, padx=5, pady=5)
-    expected_harvest_btn.grid(row=0, column=1, padx=5, pady=5)
-    health_status_btn.grid(row=0, column=0, padx=5, pady=5)
-    weather_conditions_btn.grid(row=1, column=1, padx=5, pady=5)
-    calculate_profitability_btn.grid(row=2, column=1, padx=5, pady=5)
-    
+    irrigation_btn.grid(row=0, column=0, padx=5, pady=5, sticky='ew')
+    expected_harvest_btn.grid(row=0, column=1, padx=5, pady=5, sticky='ew')
+    health_status_btn.grid(row=0, column=2, padx=5, pady=5, sticky='ew')
+    weather_conditions_btn.grid(row=0, column=3, padx=5, pady=5, sticky='ew')
+    calculate_profitability_btn.grid(row=0, column=4, padx=5, pady=5, sticky='ew')
+
+
     app_window.mainloop()
 
     connection.commit()

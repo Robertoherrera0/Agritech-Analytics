@@ -2,12 +2,12 @@ import os
 import mysql.connector
 from tkinter import *
 from tkinter import ttk
-from tkinter import simpledialog, Tk
+from tkinter import simpledialog
 import random
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-
+# Expected harvest calculation
 def expected_harvest(farmer_id, crop_id, cursor):
     cursor.execute("SELECT Health_status, Planting_date FROM CROP WHERE CropID = %s AND FarmerID = %s", (crop_id, farmer_id))
     crop_data = cursor.fetchone()
@@ -29,6 +29,7 @@ def expected_harvest(farmer_id, crop_id, cursor):
     return formatted_output
 
 
+# Health status of the crop
 def health_status(farmer_id, crop_id, cursor):
     output = []
 
@@ -57,7 +58,7 @@ def health_status(farmer_id, crop_id, cursor):
         for sensor in sensors_data:
             output.append(f"Sensor Type: {sensor[0]}, Status: {sensor[1]}")
 
-        # Calculate health status based on your criteria
+        # Calculate health status 
         if water_quality == 'Excellent' and soil_moisture == 'Optimal' and not plague_detected:
             new_health_status = 'Excellent'
         elif water_quality in ['Good', 'Fair'] or soil_moisture in ['Fair', 'Wet']:
@@ -73,14 +74,17 @@ def health_status(farmer_id, crop_id, cursor):
 
     return "\n".join(output)
 
-
+# Analyze weather conditions
 def weather_conditions(farmer_id, crop_id, cursor):
+
+    # fetch weather sensor data
     cursor.execute("SELECT Temperature, Precipitation, Wind, Humidity FROM WEATHER_SENSORS WHERE SensorID = %s", (crop_id,))
     weather_data = cursor.fetchone()
 
     if not weather_data:
         return "No weather data found for CropID " + str(crop_id)
 
+    # Scores to analyze the weather
     temperature, precipitation, wind, humidity = weather_data
     score = 0
 
@@ -96,16 +100,19 @@ def weather_conditions(farmer_id, crop_id, cursor):
     condition = "Optimal" if score == 4 else "Variable" if 2 <= score < 4 else "Challenging" if score == 1 else "Adverse"
 
     formatted_output = (
-        f"Weather Conditions for CropID {crop_id}:\n"
+        f"Weather Conditions: \n"
         f"- Temperature: {temperature}°C\n"
         f"- Precipitation: {precipitation} mm\n"
         f"- Wind: {wind} km/h\n"
         f"- Humidity: {humidity}%\n\n"
-        f"Overall Weather Condition: {condition}"
+        f"Overall Weather Assesment: {condition}"
     )
     return formatted_output
 
+
+# Irrigation efficiency analysis
 def irrigation_efficiency_analysis(farmer_id, crop_id, cursor):
+
     # Ensure farmer_id and crop_id are integers or can be converted to integers
     try:
         farmer_id = int(farmer_id)
@@ -113,7 +120,6 @@ def irrigation_efficiency_analysis(farmer_id, crop_id, cursor):
     except ValueError:
         return "Invalid farmer or crop ID."
 
-    # SQL query with proper parameter formatting
     query = """
         SELECT FARMER.Company_name, CROP.Crop_name, CROP_MONITORING.Soil_Moisture, CROP.Irrigation_Method
         FROM CROP_MONITORING
@@ -128,6 +134,7 @@ def irrigation_efficiency_analysis(farmer_id, crop_id, cursor):
         return f"No soil moisture data available for CropID {crop_id} of FarmerID {farmer_id}"
 
     company_name, crop_name, soil_moisture, irrigation_method = data
+   
     # Assessment of irrigation efficiency
     recommendation = ""
     if soil_moisture == 'Optimal':
@@ -146,7 +153,8 @@ def irrigation_efficiency_analysis(farmer_id, crop_id, cursor):
     return formatted_output
 
 def calculate_profitability(farmer_id, crop_id, cursor):
-    # SQL query to fetch data for a specific crop of a given farmer
+
+    #fetch data for a specific crop of a given farmer
     query = """
     SELECT CROP.Crop_yield, FARM.Size, CROP.Crop_name, CROP.Price
     FROM CROP
@@ -161,7 +169,7 @@ def calculate_profitability(farmer_id, crop_id, cursor):
 
     crop_yield, farm_size, crop_name, price = data
 
-    # Example cost per unit area
+    # Arbitrary cost per unit area
     cost_per_unit_area = Decimal("50.00") 
 
     # Revenue calculation
@@ -203,7 +211,7 @@ def main():
 
     app_window = Tk()
     app_window.configure(bg='#EFEFEF')
-    app_window.title("Crop Monitoring Application")
+    app_window.title("Crop Monitoring App")
     app_window.geometry("900x600")
     app_window.resizable(True, True)  # Allow resizing
 
@@ -240,10 +248,6 @@ def main():
     buttons_frame = Frame(app_window)
     buttons_frame.pack(pady=10)
 
-    # Result display area
-    result_label = Label(app_window, text="", justify=LEFT, wraplength=550, bg='white', fg='black', font=('Helvetica', 10))
-    result_label.pack(pady=10, padx=10, fill=BOTH, expand=True)
-    result_label.config(borderwidth=2, relief="groove")
     
     # Function to update crops based on selected farmer
     def update_crops(*args):
@@ -261,6 +265,11 @@ def main():
     crop_name_to_id = {}
 
     selected_farmer_name.trace('w', update_crops)
+
+    # Result display area
+    result_label = Label(app_window, text="", justify=LEFT, wraplength=550, bg='white', fg='black', font=('Helvetica', 10))
+    result_label.pack(pady=10, padx=10, fill=BOTH, expand=True)
+    result_label.config(borderwidth=2, relief="groove")
 
     # Function buttons with result update
     def call_function(func, farmer_id, crop_id):

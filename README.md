@@ -1,7 +1,7 @@
 # Crop Monitoring Application
 
 ## Introduction
-The Crop Monitoring Application is designed to assist farmers with crop health assessment, weather condition monitoring, and profitability calculation.
+The Crop Monitoring Application is designed to assist farmers with crop health assessment, weather condition monitoring, irrigation efficiency analysis, expected harvest and profitability calculation.
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ The Crop Monitoring Application is designed to assist farmers with crop health a
 1. Open MySQL Workbench.
 2. Connect to your MySQL instance.
 3. Navigate to the 'Server' menu and select 'Data Import'.
-4. Choose 'Import from Self-Contained File' and select the `phase3_schema.sql` file from this repository.
+4. Choose 'Import from Self-Contained File' and select the `project_schema.sql` file from this repository.
 5. Follow the prompts to import the schema and create the database structure.
 
 #### Application Setup

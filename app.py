@@ -217,7 +217,7 @@ def main():
 
     
     # Title for the dropdown section
-    title_label = Label(app_window, text="Crop Monitoring Application", font=('Helvetica', 18, 'bold'))
+    title_label = Label(app_window, text="Crop Monitoring App", font=('Helvetica', 18, 'bold'))
     title_label.pack(pady=(10, 0))
 
     # Description/instructions for the user

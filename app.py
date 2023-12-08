@@ -188,18 +188,21 @@ def calculate_profitability(farmer_id, crop_id, cursor):
 
     return formatted_output
 
-
+# returns data from database
 def fetch_data(cursor, query, params=None):
     cursor.execute(query, params or ())
     return cursor.fetchall()
 
 
 def main():
-    db_host = os.getenv('MY_APP_DB_HOST', 'localhost')  # Default to 'localhost' if not set
-    db_user = os.getenv('MY_APP_DB_USER', 'root')       # Default to 'root' if not set
-    db_password = simpledialog.askstring("Password", "Please enter your MySQL password:", show='*')
-    db_name = os.getenv('MY_APP_DB_NAME', 'project')    # Default to 'project' if not set
 
+    # connecting user to database
+    db_host = os.getenv('MY_APP_DB_HOST', 'localhost') 
+    db_user = os.getenv('MY_APP_DB_USER', 'root')      
+    db_password = simpledialog.askstring("Password", "Please enter your MySQL password:", show='*')
+    db_name = os.getenv('MY_APP_DB_NAME', 'project')    
+
+    # mysql connector
     connection = mysql.connector.connect(
         host=db_host,
         user=db_user,

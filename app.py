@@ -1,7 +1,6 @@
 import os
 import mysql.connector
 from tkinter import *
-from tkinter import ttk
 from tkinter import simpledialog
 import random
 from datetime import datetime, timedelta
@@ -197,10 +196,18 @@ def fetch_data(cursor, query, params=None):
 def main():
 
     # connecting user to database
+    '''
     db_host = os.getenv('MY_APP_DB_HOST', 'localhost') 
     db_user = os.getenv('MY_APP_DB_USER', 'root')      
+    db_name = os.getenv('MY_APP_DB_NAME', 'project')  
+    '''  
+    db_host = 'localhost'
+    db_user = 'root'
+    db_name = 'project'
     db_password = simpledialog.askstring("Password", "Please enter your MySQL password:", show='*')
-    db_name = os.getenv('MY_APP_DB_NAME', 'project')    
+    
+
+
 
     # mysql connector
     connection = mysql.connector.connect(
@@ -275,21 +282,21 @@ def main():
     result_label.config(borderwidth=2, relief="groove")
 
     # Function buttons with result update
-    def call_function(func, farmer_id, crop_id):
-        result_text = func(farmer_id, crop_id, cursor)
+    def call_function(func):
+        result_text = func(farmer_name_to_id[selected_farmer_name.get()],  crop_name_to_id[selected_crop_name.get()], cursor)
         result_label.config(text=result_text)
 
     # Buttons for functions
-    irrigation_btn = Button(buttons_frame, text="Irrigation Efficiency Analysis", command=lambda: call_function(irrigation_efficiency_analysis, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
-    expected_harvest_btn = Button(buttons_frame, text="Expected Harvest", command=lambda: call_function(expected_harvest, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
-    health_status_btn = Button(buttons_frame, text="Check Health Status", command=lambda: call_function(health_status, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
-    weather_conditions_btn = Button(buttons_frame, text="Check Weather Conditions", command=lambda: call_function(weather_conditions, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
-    calculate_profitability_btn = Button(buttons_frame, text="Calculate Profibality", command=lambda: call_function(calculate_profitability, farmer_name_to_id[selected_farmer_name.get()], crop_name_to_id[selected_crop_name.get()]))
+    irrigation_btn = Button(buttons_frame, text="Irrigation Efficiency Analysis", command=lambda: call_function(irrigation_efficiency_analysis))
+    expected_harvest_btn = Button(buttons_frame, text="Expected Harvest", command=lambda: call_function(expected_harvest))
+    health_status_btn = Button(buttons_frame, text="Check Health Status", command=lambda: call_function(health_status))
+    weather_conditions_btn = Button(buttons_frame, text="Check Weather Conditions", command=lambda: call_function(weather_conditions))
+    calculate_profitability_btn = Button(buttons_frame, text="Calculate Profibality", command=lambda: call_function(calculate_profitability))
     
-    irrigation_btn.grid(row=0, column=0, padx=5, pady=5, sticky='ew')
-    expected_harvest_btn.grid(row=0, column=1, padx=5, pady=5, sticky='ew')
-    health_status_btn.grid(row=0, column=2, padx=5, pady=5, sticky='ew')
-    weather_conditions_btn.grid(row=0, column=3, padx=5, pady=5, sticky='ew')
+    irrigation_btn.grid(row=0, column=3, padx=5, pady=5, sticky='ew')
+    expected_harvest_btn.grid(row=0, column=2, padx=5, pady=5, sticky='ew')
+    health_status_btn.grid(row=0, column=0, padx=5, pady=5, sticky='ew')
+    weather_conditions_btn.grid(row=0, column=1, padx=5, pady=5, sticky='ew')
     calculate_profitability_btn.grid(row=0, column=4, padx=5, pady=5, sticky='ew')
 
 
